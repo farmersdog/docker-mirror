@@ -112,10 +112,10 @@ func (m *mirror) setup(repo Repository) (err error) {
 }
 
 // filter tags by
-//  - by matching tag name (with glob support)
-//  - by exluding tag name (with glob support)
-//  - by tag age
-//  - by max number of tags to process
+//   - by matching tag name (with glob support)
+//   - by exluding tag name (with glob support)
+//   - by tag age
+//   - by max number of tags to process
 func (m *mirror) filterTags() {
 	now := time.Now()
 	res := make([]RepositoryTag, 0)
@@ -182,7 +182,16 @@ func (m *mirror) targetRepositoryName() string {
 		return fmt.Sprintf("%s%s", *m.repo.TargetPrefix, m.repo.Name)
 	}
 
-	return fmt.Sprintf("%s%s", config.Target.Prefix, m.repo.Name)
+	// returns the target repository name minus farmersdog/ prefix
+	// if farmersdog/ is not present, it returns the full name
+	var repo_name string
+	if strings.Contains(m.repo.Name, "farmersdog/") {
+		repo_name = strings.Split(m.repo.Name, "/")[1]
+	} else {
+		repo_name = m.repo.Name
+	}
+
+	return fmt.Sprintf("%s%s", config.Target.Prefix, repo_name)
 }
 
 // pull the image from remote repository to local docker agent
